@@ -1,0 +1,19 @@
+{
+  "name": "mpesa-express",
+  "version": "1.0.0",
+  "description": "this is a npm package for integrating mpesa savices with node js",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "tsc src/index.ts"
+  },
+  "keywords": [
+    "mpesa",
+    "integration"
+  ],
+  "author": "Dev Thagichu",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^13.7.0",
+    "axios": "^0.19.2"
+  }
+}
