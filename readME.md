@@ -57,9 +57,9 @@ Add to project
 ### B2C Payment Request
 ###### Use this API to transact between an M-Pesa short code to a phone number registered on M-Pesa.
 
-        mpesa.b2c(Amount: string, PartyA: string, PartyB: string, Remarks: string, CommandID: string, Occassion: string, SecurityCredential: string)
+        mpesa.b2c(Amount, PartyA, PartyB, Remarks, CommandID, Occassion, SecurityCredential)
 
 ### Account Balance Request
 ###### Use this API to enquire the balance on an M-Pesa BuyGoods (Till Number)
 
-        mpesa.checkAccountBalance(CommandID: string, IdentifierType: string, Remarks: string)
+        mpesa.checkAccountBalance(CommandID, IdentifierType, Remarks)
