@@ -63,8 +63,4 @@ Add to project
 ### Account Balance Request
 ###### Use this API to enquire the balance on an M-Pesa BuyGoods (Till Number)
 
-<<<<<<< HEAD
         mpesa.checkAccountBalance(CommandID, IdentifierType, Remarks)
-=======
-        mpesa.checkAccountBalance(CommandID, IdentifierType, Remarks)
->>>>>>> development
