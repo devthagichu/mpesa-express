@@ -1,6 +1,8 @@
  # Getting Started
+![mpesa express](nodejs.png)
 
-    
+
+    this is a npm package for integrating mpesa savices with node js
 
 ### Installation 
 
