@@ -1,6 +1,6 @@
 {
   "name": "mpesa-express",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "this is a npm package for integrating mpesa savices with node js",
   "main": "dist/index.js",
   "scripts": {
