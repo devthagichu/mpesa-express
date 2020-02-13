@@ -83,7 +83,7 @@ class Mpesa {
 
     async _getAuthToken() {
 
-        let auth: string = "Basic " + new (Buffer.from(this.consumer_key + ":" + this.consumer_secret).toString("base64") as any)
+        let auth: string = "Basic " + Buffer.from(this.consumer_key + ":" + this.consumer_secret).toString("base64") as string
 
         try {
             let res = await axios.get(this._authURL, { headers: { "Authorization": auth } })
@@ -117,7 +117,7 @@ class Mpesa {
 
     _generatePassword(): string {
         let Timestamp = this._generateTimeStamp()
-        return new (Buffer.from(this.BusinessShortCode + this.passkey + Timestamp).toString("base64") as any)
+        return Buffer.from(this.BusinessShortCode + this.passkey + Timestamp).toString("base64") as string
     }
 
 

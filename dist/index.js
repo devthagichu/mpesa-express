@@ -29,7 +29,7 @@ class Mpesa {
     //  AUTH Request
     //  Use this API to generate an OAuth access token to access other APIs
     async _getAuthToken() {
-        let auth = "Basic " + new (Buffer.from(this.consumer_key + ":" + this.consumer_secret).toString("base64"));
+        let auth = "Basic " + Buffer.from(this.consumer_key + ":" + this.consumer_secret).toString("base64");
         try {
             let res = await axios.get(this._authURL, { headers: { "Authorization": auth } });
             let { access_token } = res.data;
@@ -58,7 +58,7 @@ class Mpesa {
     }
     _generatePassword() {
         let Timestamp = this._generateTimeStamp();
-        return new (Buffer.from(this.BusinessShortCode + this.passkey + Timestamp).toString("base64"));
+        return Buffer.from(this.BusinessShortCode + this.passkey + Timestamp).toString("base64");
     }
     // Lipa Na M-Pesa Online Payment API
     // Use this API to initiate online payment on behalf of a customer.
