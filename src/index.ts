@@ -11,6 +11,7 @@ interface Config_Options {
     ShortCode: number,
     SecurityCredential: string,
     Initiator: string,
+    callBackBaseUrl: string
 }
 
 
@@ -32,6 +33,8 @@ class Mpesa {
 
     stkTransactionType: string
 
+    callBackBaseUrl: string
+
     _accountBalanceURL: string
     _authURL: string
     _stkURL: string
@@ -49,15 +52,20 @@ class Mpesa {
         this.ShortCode = options.ShortCode
         this.SecurityCredential = options.SecurityCredential
         this.Initiator = options.Initiator
+        this.callBackBaseUrl = options.callBackBaseUrl
+
+        this.stkTransactionType = "CustomerPayBillOnline"
 
 
-        this.stkTransactionType = "CustomerPayBillOnline",
 
-            this.QueueTimeOutURL = "https://1bc68cbb.ngrok.io/mpesa"
-        this.ResultURL = "https://1bc68cbb.ngrok.io/mpesa"
-        this.CallBackURL = "https://1bc68cbb.ngrok.io/mpesa"
-        this.ConfirmationURL = "https://1bc68cbb.ngrok.io/mpesa"
-        this.ValidationURL = "https://1bc68cbb.ngrok.io/mpesa"
+        this.QueueTimeOutURL = `${this.callBackBaseUrl}/queue`
+        this.ResultURL = `${this.callBackBaseUrl}/result`
+        this.CallBackURL = `${this.callBackBaseUrl}/callback`
+        this.ConfirmationURL = `${this.callBackBaseUrl}/confirm`
+        this.ValidationURL = `${this.callBackBaseUrl}/valid`
+
+
+
 
         this._accountBalanceURL = "https://sandbox.safaricom.co.ke/mpesa/accountbalance/v1/query"
         this._authURL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
@@ -75,7 +83,7 @@ class Mpesa {
 
     async _getAuthToken() {
 
-        let auth: string = "Basic " + new Buffer.from(this.consumer_key + ":" + this.consumer_secret).toString("base64")
+        let auth: string = "Basic " + new (Buffer.from(this.consumer_key + ":" + this.consumer_secret).toString("base64") as any)
 
         try {
             let res = await axios.get(this._authURL, { headers: { "Authorization": auth } })
@@ -92,7 +100,7 @@ class Mpesa {
     }
 
 
-    pad2(n) { return n < 10 ? '0' + n : n }
+    pad2(n: any) { return n < 10 ? '0' + n : n }
 
     async _setHeaders() {
         let access_token = await this._getAuthToken()
@@ -109,7 +117,7 @@ class Mpesa {
 
     _generatePassword(): string {
         let Timestamp = this._generateTimeStamp()
-        return new Buffer.from(this.BusinessShortCode + this.passkey + Timestamp).toString("base64")
+        return new (Buffer.from(this.BusinessShortCode + this.passkey + Timestamp).toString("base64") as any)
     }
 
 
@@ -118,14 +126,20 @@ class Mpesa {
     // Use this API to initiate online payment on behalf of a customer.
 
 
-    async sktPush(Amount: number, PhoneNumber: number, AccountReference: string, TransactionDesc: string) {
 
-        let headers = await this._setHeaders()
-        var Timestamp = this._generateTimeStamp()
-        var Password = this._generatePassword()
+    sktPush(Amount: number, PhoneNumber: number, AccountReference: string, TransactionDesc: string) {
+
+        return new Promise(async (resolve, reject) => {
 
 
-        return new Promise((resolve, reject) => {
+            if (!Amount) reject(new Error("Must provide an amount"))
+            if (!PhoneNumber) reject(new Error("Must provide a PhoneNumber"))
+            if (!AccountReference) reject(new Error("Must provide an AccountReference"))
+            if (!TransactionDesc) reject(new Error("Must provide a TransactionDesc"))
+
+            let headers = await this._setHeaders()
+            var Timestamp = this._generateTimeStamp()
+            var Password = this._generatePassword()
 
             let requestBody = {
                 BusinessShortCode: this.BusinessShortCode,
@@ -163,18 +177,24 @@ class Mpesa {
     // Lipa Na M-Pesa Query Request API
     // Use this API to check the status of a Lipa Na M-Pesa Online Payment.
 
-    async stkCheck(CheckoutRequestID: string) {
-        let headers = await this._setHeaders()
+    stkCheck(CheckoutRequestID: string) {
 
-        let requestBody = {
-            BusinessShortCode: this.BusinessShortCode,
-            CheckoutRequestID,
-            Timestamp: this._generateTimeStamp(),
-            Password: this._generatePassword()
-        }
-        let data = JSON.stringify(requestBody)
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+
+            if (!CheckoutRequestID) reject(new Error("Must provide an CheckoutRequestID"))
+
+            let headers = await this._setHeaders()
+
+            let requestBody = {
+                BusinessShortCode: this.BusinessShortCode,
+                CheckoutRequestID,
+                Timestamp: this._generateTimeStamp(),
+                Password: this._generatePassword()
+            }
+            let data = JSON.stringify(requestBody)
+
+
             try {
                 axios({
                     method: "POST",
@@ -194,19 +214,27 @@ class Mpesa {
     // Use this API to register validation and confirmation URLs on M-Pesa 
 
 
-    async  c2bRegister(ConfirmationURL: string, ValidationURL: string, ResponseType: string, ShortCode: string) {
-        let headers = await this._setHeaders()
+    c2bRegister(ConfirmationURL: string, ValidationURL: string, ResponseType: string, ShortCode: string) {
 
-        let requestBody = {
-            ShortCode,
-            ResponseType,
-            ConfirmationURL,
-            ValidationURL
-        }
 
-        let data = JSON.stringify(requestBody)
+        return new Promise(async (resolve, reject) => {
 
-        return new Promise((resolve, reject) => {
+            if (!ConfirmationURL) reject(new Error("Must provide a ConfirmationURL"))
+            if (!ValidationURL) reject(new Error("Must provide a ValidationURL"))
+            if (!ResponseType) reject(new Error("Must provide a ResponseType"))
+            if (!ShortCode) reject(new Error("Must provide a ShortCode"))
+
+            let headers = await this._setHeaders()
+
+            let requestBody = {
+                ShortCode,
+                ResponseType,
+                ConfirmationURL,
+                ValidationURL
+            }
+
+            let data = JSON.stringify(requestBody)
+
             try {
                 axios({
                     method: "POST",
@@ -233,27 +261,39 @@ class Mpesa {
     // You can use the sandbox provided test credentials down below to simulates a payment made from the client phone's STK/SIM Toolkit menu, and enables you to receive the payment requests in real time.
 
 
-    async  c2bTransact(ShortCode: string, CommandID: string, Amount: string, Msisdn: string, BillRefNumber: string) {
-        let headers = await this._setHeaders()
+    c2bTransact(ShortCode: string, CommandID: string, Amount: string, Msisdn: string, BillRefNumber: string) {
 
-        let requestBody = {
-            ShortCode,
-            CommandID,
-            Amount,
-            Msisdn,
-            BillRefNumber
-        }
-        let data = JSON.stringify(requestBody)
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+
+            if (!ShortCode) reject(new Error("Must provide a ShortCode"))
+            if (!CommandID) reject(new Error("Must provide a CommandID"))
+            if (!Amount) reject(new Error("Must provide an Amount"))
+            if (!Msisdn) reject(new Error("Must provide a Msisdn"))
+            if (!BillRefNumber) reject(new Error("Must provide a BillRefNumber"))
+
+
+            let headers = await this._setHeaders()
+
+            let requestBody = {
+                ShortCode,
+                CommandID,
+                Amount,
+                Msisdn,
+                BillRefNumber
+            }
+            let data = JSON.stringify(requestBody)
 
             try {
                 axios({
                     method: "POST",
                     url: this._c2bSimulateURL,
                     data
-                })
+                }).then((res: any) => resolve(res.data))
+                    .catch((error: any) => { reject(error.response.data) })
 
+            } catch (error) {
+                reject(error)
             }
 
 
@@ -269,24 +309,31 @@ class Mpesa {
     // Use this API to enquire the balance on an M-Pesa BuyGoods (Till Number).
 
 
-    async  checkAccountBalance(CommandID: string, IdentifierType: string, Remarks: string) {
-        let headers = await this._setHeaders()
-
-        let requestBody = {
-            Initiator: this.Initiator,
-            SecurityCredential: this.SecurityCredential,
-            CommandID,
-            PartyA: this.ShortCode,
-            IdentifierType,
-            Remarks,
-            QueueTimeOutURL: this.QueueTimeOutURL,
-            ResultURL: this.ResultURL
-        }
-
-        let data = JSON.stringify(requestBody)
+    checkAccountBalance(CommandID: string, IdentifierType: string, Remarks: string) {
 
 
-        return new Promise((resolve, reject) => {
+
+        return new Promise(async (resolve, reject) => {
+
+            if (!CommandID) reject(new Error("Must provide a CommandID"))
+            if (!IdentifierType) reject(new Error("Must provide an IdentifierType"))
+            if (!Remarks) reject(new Error("Must provide a Remarks"))
+
+            let headers = await this._setHeaders()
+
+            let requestBody = {
+                Initiator: this.Initiator,
+                SecurityCredential: this.SecurityCredential,
+                CommandID,
+                PartyA: this.ShortCode,
+                IdentifierType,
+                Remarks,
+                QueueTimeOutURL: this.QueueTimeOutURL,
+                ResultURL: this.ResultURL
+            }
+
+            let data = JSON.stringify(requestBody)
+
             try {
                 axios({
                     method: "POST",
@@ -309,24 +356,36 @@ class Mpesa {
     //  Use this API to transact between an M-Pesa short code to a phone number registered on M-Pesa.
 
 
-    async b2c(Amount: string, PartyA: string, PartyB: string, Remarks: string, CommandID: string, Occassion: string, SecurityCredential: string) {
-        let headers = await this._setHeaders()
+    b2c(Amount: string, PartyA: string, PartyB: string, Remarks: string, CommandID: string, Occassion: string, SecurityCredential: string) {
 
-        let requestBody = {
-            InitiatorName: this.Initiator,
-            SecurityCredential,
-            CommandID,
-            Amount,
-            PartyA,
-            PartyB,
-            Remarks,
-            QueueTimeOutURL: this.QueueTimeOutURL,
-            ResultURL: this.ResultURL,
-            Occassion
-        }
+        return new Promise(async (resolve, reject) => {
 
-        let data = JSON.stringify(requestBody)
-        return new Promise((resolve, reject) => {
+            if (!Amount) reject(new Error("Must provide a Amount"))
+            if (!PartyA) reject(new Error("Must provide a PartyA"))
+            if (!PartyB) reject(new Error("Must provide a PartyB"))
+            if (!CommandID) reject(new Error("Must provide a CommandID"))
+            if (!Occassion) reject(new Error("Must provide a Occassion"))
+            if (!Remarks) reject(new Error("Must provide a Remarks"))
+            if (!SecurityCredential) reject(new Error("Must provide a SecurityCredential"))
+
+
+
+            let headers = await this._setHeaders()
+
+            let requestBody = {
+                InitiatorName: this.Initiator,
+                SecurityCredential,
+                CommandID,
+                Amount,
+                PartyA,
+                PartyB,
+                Remarks,
+                QueueTimeOutURL: this.QueueTimeOutURL,
+                ResultURL: this.ResultURL,
+                Occassion
+            }
+
+            let data = JSON.stringify(requestBody)
             try {
                 axios({
                     method: "POST",
