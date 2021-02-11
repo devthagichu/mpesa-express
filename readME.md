@@ -255,8 +255,17 @@ https://developer.safaricom.co.ke/account-balance/apis/post/query
 All the support for this library is done through: https://github.com/devthagichu/mpesa-express/issues
 
 
-## Author
+## Author Details
+
 Anthony Gitau Thagichu
+
 Twitter: https://twitter.com/devthagichu
+
+Facebook: https://www.facebook.com/devthagichu
+
+Youtube: https://www.youtube.com/channel/UC7_SdKhua8Ysxzj2y_1km3Q?view_as=subscriber
+
+Linkedn: https://www.linkedin.com/in/devthagichu/
+
 
 
