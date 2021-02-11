@@ -69,6 +69,26 @@ Add to project
 ###### Use this API to initiate online payment on behalf of a customer.
 https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpush/v1/processrequest
 
+        
+        // The Lipa Na M-Pesa Online Payment options are found on the API Section under Lipa Na M-Pesa Online Payment API
+        // https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpush/v1/processrequest
+
+
+        // The transaction amount you want to simulate 
+        const Amount = "<INTEGER>" // 1
+
+        // The Transacting Mobile Number
+        const PhoneNumber = "<INTEGER>" // 2547xxxxxxxx
+
+        // Any Refferance or ID that you would what to associate the 
+        // transaction with
+        const AccountReference = "<STRING>" // Invoice-001
+
+        // Any Description that you would what to associate the 
+        // transaction with
+        const TransactionDesc = "<STRING>" // Admission fee
+
+        
         mpesa.sktPush(Amount, PhoneNumber, AccountReference, TransactionDesc) 
 
 ### Lipa Na M-Pesa Query Request API
