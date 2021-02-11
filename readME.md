@@ -95,7 +95,7 @@ https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpush/v1/pro
         
         mpesa.sktPush(Amount, PhoneNumber, AccountReference, TransactionDesc)
         .then((result) => console.log(result))
-        .catch((error) => console.error(err));
+        .catch((error) => console.error(error));
 
 ### Lipa Na M-Pesa Query Request API
 ###### Use this API to check the status of a Lipa Na M-Pesa Online Payment.
@@ -110,7 +110,7 @@ https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpushquery/v
 
         mpesa.stkCheck(CheckoutRequestID)
         .then((result) => console.log(result))
-        .catch((error) => console.error(err));
+        .catch((error) => console.error(error));
 
 ### C2B Register URL
  ###### Use this API to register validation and confirmation URLs on M-Pesa 
@@ -142,7 +142,7 @@ https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpushquery/v
         
         mpesa.c2bRegister( ConfirmationURL, ValidationURL, ResponseType, ShortCode)  
         .then((result) => console.log(result))
-        .catch((error) => console.error(err));
+        .catch((error) => console.error(error));
 
 ### C2B Simulate Transaction
 ###### This API is used to make payment requests from Client to Business (C2B). 
@@ -178,7 +178,7 @@ https://developer.safaricom.co.ke/c2b/apis/post/simulate
         
         mpesa.c2bTransact(ShortCode, CommandID, Amount, Msisdn, BillRefNumber)  
         .then((result) => console.log(result))
-        .catch((error) => console.error(err));
+        .catch((error) => console.error(error));
 
 ### B2C Payment Request
 ###### Use this API to transact between an M-Pesa short code to a phone number registered on M-Pesa.
@@ -186,7 +186,7 @@ https://developer.safaricom.co.ke/b2c/apis/post/paymentrequest
 
         mpesa.b2c(Amount, PartyA, PartyB, Remarks, CommandID, Occassion, SecurityCredential)  
         .then((result) => console.log(result))
-        .catch((error) => console.error(err));
+        .catch((error) => console.error(error));
 
 ### Account Balance Request
 ###### Use this API to enquire the balance on an M-Pesa BuyGoods (Till Number)
@@ -214,7 +214,7 @@ https://developer.safaricom.co.ke/account-balance/apis/post/query
 
         mpesa.checkAccountBalance(CommandID, IdentifierType, Remarks)
         .then((result) => console.log(result))
-        .catch((error) => console.error(err));
+        .catch((error) => console.error(error));
         
 ## Support for this Library
 
