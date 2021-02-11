@@ -60,6 +60,26 @@ Add to project
 ### C2B Register URL
  ###### Use this API to register validation and confirmation URLs on M-Pesa 
 
+        //The C2B options are found on the API Section under C2B Register URL 
+        //https://developer.safaricom.co.ke/c2b/apis/post/registerurl
+
+
+        // Confirmation URL is the CALLBACK URL to your app
+        // Safaricom will send a POST request to this url once a C2B payment is confirmed
+        const ConfirmationURL = "<STRING>" // https://youapp/confirm
+
+        // Validation URL is the CALLBACK URL to your app
+        // Safaricom will send a POST request to this url once a C2B payment is confirmed
+        const ValidationURL = "<STRING>" // https://youapp/valid
+
+        // Both ConfirmationURL and ValidationURL must be HTTPS
+
+        // Response types are: Completed or Cancelled.
+        const ResponseType = "<STRING>"
+
+        // This is the Business C2B shortcode
+        const ShortCode = "<INTEGER>" // 600000
+        
         mpesa.c2bRegister( ConfirmationURL, ValidationURL, ResponseType, ShortCode)
 
 ### C2B Simulate Transaction
