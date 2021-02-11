@@ -1,8 +1,15 @@
- # Getting Started
+ # MPESA EXPRESS
+ 
+ Mpesa Express is an open source library designed, Developed and maintained by Dev Thagichu [ https://github.com/devthagichu ].
+ The Library is a wrapper around Safaricom's Daraja API that can be used in Node JS Applications
+ 
+ 
+ 
+ ## Getting Started
 ![mpesa express](nodejs.png)
 
 
-    this is a npm package for integrating mpesa savices with node js
+    This is a npm package for integrating mpesa savices with node js
 
 ### Installation 
 
@@ -97,3 +104,14 @@ Add to project
 ###### Use this API to enquire the balance on an M-Pesa BuyGoods (Till Number)
 
         mpesa.checkAccountBalance(CommandID, IdentifierType, Remarks)
+        
+## Support for this Library
+
+All the support for this library is done through: https://github.com/devthagichu/mpesa-express/issues
+
+
+## Author
+Anthony Gitau Thagichu
+Twitter: https://twitter.com/devthagichu
+
+
