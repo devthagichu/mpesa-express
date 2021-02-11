@@ -9,14 +9,10 @@
 ![mpesa express](nodejs.png)
 
 
-    This is a npm package for integrating mpesa savices with node js
-
 ### Installation 
 
         npm install mpesa-express
 
-
-### Features
 
 
 ### Quick Start
@@ -53,6 +49,9 @@ Add to project
     
         const mpesa = new Mpesa(options)
 
+
+
+### Features
 
 ###   Lipa Na M-Pesa Online Payment API
 ###### Use this API to initiate online payment on behalf of a customer.
