@@ -259,7 +259,6 @@ https://developer.safaricom.co.ke/account-balance/apis/post/query
         .then((result) => console.log(result))
         .catch((error) => console.error(error));
 
-
 ## Support for this Library
 
 All the support for this library is done through: https://github.com/devthagichu/mpesa-express/issues
@@ -275,3 +274,7 @@ Facebook: https://www.facebook.com/devthagichu
 Youtube: https://www.youtube.com/channel/UC7_SdKhua8Ysxzj2y_1km3Q?view_as=subscriber
 
 Linkedn: https://www.linkedin.com/in/devthagichu/
+
+## License
+
+This project is licensed under the MIT License.
