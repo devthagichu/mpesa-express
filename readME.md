@@ -75,17 +75,21 @@ https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpush/v1/pro
 
 
         // The transaction amount you want to simulate 
+        
         const Amount = "<INTEGER>" // 1
 
         // The Transacting Mobile Number
+        
         const PhoneNumber = "<INTEGER>" // 2547xxxxxxxx
 
         // Any Refferance or ID that you would what to associate the 
         // transaction with
+        
         const AccountReference = "<STRING>" // Invoice-001
 
         // Any Description that you would what to associate the 
         // transaction with
+        
         const TransactionDesc = "<STRING>" // Admission fee
 
         
@@ -94,6 +98,13 @@ https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpush/v1/pro
 ### Lipa Na M-Pesa Query Request API
 ###### Use this API to check the status of a Lipa Na M-Pesa Online Payment.
 https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpushquery/v1/query
+
+        // The Lipa Na M-Pesa Query Request API options are found on the API Section under Lipa Na M-Pesa Query Request API
+        // https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpushquery/v1/query
+
+        // This is a global unique identifier of the processed checkout transaction request.
+        
+        const CheckoutRequestID = "<STRING>" // ws_CO_DMZ_123212312_2342347678234
 
         mpesa.stkCheck(CheckoutRequestID)
 
