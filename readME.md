@@ -182,6 +182,26 @@ https://developer.safaricom.co.ke/b2c/apis/post/paymentrequest
 ###### Use this API to enquire the balance on an M-Pesa BuyGoods (Till Number)
 https://developer.safaricom.co.ke/account-balance/apis/post/query
 
+        // The Account Balance Request options are found on the API Section under Account Balance Request
+        // https://developer.safaricom.co.ke/account-balance/apis/post/query
+
+
+        // Type of commands
+        
+        const CommandID = "<STRING>" // AccountBalance
+
+        // Type of organization receiving the transaction
+        // Types examples 
+        // 1 – MSISDN
+        // 2 – Till Number
+        // 4 – Organization short code
+
+        const IdentifierType = "<INTEGER>" // 1
+
+        // 	Comments that are sent along with the transaction.
+        
+        const Remarks = "<STRING>" // Monthly check
+
         mpesa.checkAccountBalance(CommandID, IdentifierType, Remarks)
         
 ## Support for this Library
