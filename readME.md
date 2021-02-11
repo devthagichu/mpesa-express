@@ -7,6 +7,12 @@
  Safaricom Daraja API: https://developer.safaricom.co.ke/
  
  
+ ## support
+ 
+ - [x] Typescript
+ - [x] Promises
+ 
+ 
  
  ## Getting Started
 ![mpesa express](nodejs.png)
