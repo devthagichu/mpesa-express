@@ -23,9 +23,7 @@ Safaricom Daraja API: https://developer.safaricom.co.ke/
 
         yarn add mpesa-express
 
-### Quick Start
 
-        npm install mpesa-express
 
 Add to project
 
@@ -258,6 +256,18 @@ https://developer.safaricom.co.ke/account-balance/apis/post/query
         mpesa.checkAccountBalance(CommandID, IdentifierType, Remarks)
         .then((result) => console.log(result))
         .catch((error) => console.error(error));
+        
+### Test Details
+
+        Shortcode 1:   600147
+        Initiator Name:   (Shortcode 1)        testapi
+        Security Credential:   (Shortcode 1)   Safaricom147!
+        Shortcode 2:   600000
+        Test MSISDN:   254708374149
+        ExpiryDate:   2017-11-13T18:59:13+03:00
+        Lipa Na Mpesa Online Shortcode:   174379
+        Lipa Na Mpesa Online PassKey:    bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919
+        
 
 ## Support for this Library
 
