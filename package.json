@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc src/index.ts"
+    "build": "tsc src/index.ts",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [
     "mpesa",
@@ -13,11 +15,17 @@
   ],
   "author": "Dev Thagichu",
   "license": "ISC",
-  "dependencies": {
-    "@types/node": "^13.7.0",
-    "axios": "^0.21.1"
+  "engines": {
+    "node": ">=18.0.0"
   },
-  "devDependencies": {},
+  "dependencies": {
+    "@types/node": "^18.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "@types/jest": "^29.5.12"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/devthagichu/mpesa-express.git"

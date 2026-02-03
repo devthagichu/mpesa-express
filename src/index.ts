@@ -1,7 +1,3 @@
-import { resolve } from "dns"
-import { rejects } from "assert"
-
-const axios = require('axios')
 
 interface Config_Options {
     consumer_key: string,
@@ -86,15 +82,19 @@ class Mpesa {
         let auth: string = "Basic " + Buffer.from(this.consumer_key + ":" + this.consumer_secret).toString("base64") as string
 
         try {
-            let res = await axios.get(this._authURL, { headers: { "Authorization": auth } })
-            let { access_token } = res.data
+            let res = await fetch(this._authURL, { headers: { "Authorization": auth } })
+            let data = await res.json()
+            if (!res.ok) {
+                throw new Error(data.errorMessage || 'Authentication failed')
+            }
+            let { access_token } = data
             if (access_token) {
                 this.AuthToken = access_token
                 console.log(access_token)
             }
-        } catch (error) {
+        } catch (error: any) {
             this.AuthToken = ''
-            console.error(error.response.data.errorMessage)
+            console.error(error.message || error)
         }
         return this.AuthToken
     }
@@ -102,9 +102,9 @@ class Mpesa {
 
     pad2(n: any) { return n < 10 ? '0' + n : n }
 
-    async _setHeaders() {
+    async _getHeaders() {
         let access_token = await this._getAuthToken()
-        axios.defaults.headers = {
+        return {
             Authorization: "Bearer " + access_token,
             'Content-Type': 'application/json'
         }
@@ -127,49 +127,40 @@ class Mpesa {
 
 
 
-    sktPush(Amount: number, PhoneNumber: number, AccountReference: string, TransactionDesc: string) {
+    async stkPush(Amount: number, PhoneNumber: number, AccountReference: string, TransactionDesc: string) {
+        if (!Amount) throw new Error("Must provide an amount")
+        if (!PhoneNumber) throw new Error("Must provide a PhoneNumber")
+        if (!AccountReference) throw new Error("Must provide an AccountReference")
+        if (!TransactionDesc) throw new Error("Must provide a TransactionDesc")
 
-        return new Promise(async (resolve, reject) => {
+        let headers = await this._getHeaders()
+        var Timestamp = this._generateTimeStamp()
+        var Password = this._generatePassword()
 
+        let requestBody = {
+            BusinessShortCode: this.BusinessShortCode,
+            TransactionType: this.stkTransactionType,
+            PartyB: this.BusinessShortCode,
+            CallBackURL: this.CallBackURL,
+            Amount,
+            PartyA: PhoneNumber,
+            PhoneNumber,
+            AccountReference,
+            TransactionDesc,
+            Timestamp,
+            Password
+        }
 
-            if (!Amount) reject(new Error("Must provide an amount"))
-            if (!PhoneNumber) reject(new Error("Must provide a PhoneNumber"))
-            if (!AccountReference) reject(new Error("Must provide an AccountReference"))
-            if (!TransactionDesc) reject(new Error("Must provide a TransactionDesc"))
-
-            let headers = await this._setHeaders()
-            var Timestamp = this._generateTimeStamp()
-            var Password = this._generatePassword()
-
-            let requestBody = {
-                BusinessShortCode: this.BusinessShortCode,
-                TransactionType: this.stkTransactionType,
-                PartyB: this.BusinessShortCode,
-                CallBackURL: this.CallBackURL,
-                Amount,
-                PartyA: PhoneNumber,
-                PhoneNumber,
-                AccountReference,
-                TransactionDesc,
-                Timestamp,
-                Password
-            }
-
-            let data = JSON.stringify(requestBody)
-
-            try {
-                axios({
-                    method: "POST",
-                    url: this._stkURL,
-                    data
-                })
-                    .then((res: any) => { resolve(res.data) })
-                    .catch((error: any) => { reject(error.response.data) })
-
-            } catch (error) {
-                reject(error.response.data)
-            }
+        let res = await fetch(this._stkURL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(requestBody)
         })
+        let data = await res.json()
+        if (!res.ok) {
+            throw data
+        }
+        return data
     }
 
 
@@ -177,36 +168,28 @@ class Mpesa {
     // Lipa Na M-Pesa Query Request API
     // Use this API to check the status of a Lipa Na M-Pesa Online Payment.
 
-    stkCheck(CheckoutRequestID: string) {
+    async stkCheck(CheckoutRequestID: string) {
+        if (!CheckoutRequestID) throw new Error("Must provide an CheckoutRequestID")
 
+        let headers = await this._getHeaders()
 
-        return new Promise(async (resolve, reject) => {
+        let requestBody = {
+            BusinessShortCode: this.BusinessShortCode,
+            CheckoutRequestID,
+            Timestamp: this._generateTimeStamp(),
+            Password: this._generatePassword()
+        }
 
-            if (!CheckoutRequestID) reject(new Error("Must provide an CheckoutRequestID"))
-
-            let headers = await this._setHeaders()
-
-            let requestBody = {
-                BusinessShortCode: this.BusinessShortCode,
-                CheckoutRequestID,
-                Timestamp: this._generateTimeStamp(),
-                Password: this._generatePassword()
-            }
-            let data = JSON.stringify(requestBody)
-
-
-            try {
-                axios({
-                    method: "POST",
-                    url: this._stkCheckURL,
-                    data
-                })
-                    .then((res: any) => { resolve(res.data) })
-                    .catch((error: any) => { reject(error.response.data) })
-            } catch (error) {
-                reject(error.response.data)
-            }
+        let res = await fetch(this._stkCheckURL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(requestBody)
         })
+        let data = await res.json()
+        if (!res.ok) {
+            throw data
+        }
+        return data
     }
 
 
@@ -214,43 +197,31 @@ class Mpesa {
     // Use this API to register validation and confirmation URLs on M-Pesa 
 
 
-    c2bRegister(ConfirmationURL: string, ValidationURL: string, ResponseType: string, ShortCode: string) {
+    async c2bRegister(ConfirmationURL: string, ValidationURL: string, ResponseType: string, ShortCode: string) {
+        if (!ConfirmationURL) throw new Error("Must provide a ConfirmationURL")
+        if (!ValidationURL) throw new Error("Must provide a ValidationURL")
+        if (!ResponseType) throw new Error("Must provide a ResponseType")
+        if (!ShortCode) throw new Error("Must provide a ShortCode")
 
+        let headers = await this._getHeaders()
 
-        return new Promise(async (resolve, reject) => {
+        let requestBody = {
+            ShortCode,
+            ResponseType,
+            ConfirmationURL,
+            ValidationURL
+        }
 
-            if (!ConfirmationURL) reject(new Error("Must provide a ConfirmationURL"))
-            if (!ValidationURL) reject(new Error("Must provide a ValidationURL"))
-            if (!ResponseType) reject(new Error("Must provide a ResponseType"))
-            if (!ShortCode) reject(new Error("Must provide a ShortCode"))
-
-            let headers = await this._setHeaders()
-
-            let requestBody = {
-                ShortCode,
-                ResponseType,
-                ConfirmationURL,
-                ValidationURL
-            }
-
-            let data = JSON.stringify(requestBody)
-
-            try {
-                axios({
-                    method: "POST",
-                    url: this._c2bRegisterURL,
-                    data
-                })
-                    .then((res: any) => resolve(res.data))
-                    .catch((error: any) => { reject(error.response.data) })
-            } catch (error) {
-                reject(error)
-            }
+        let res = await fetch(this._c2bRegisterURL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(requestBody)
         })
-
-
-
-
+        let data = await res.json()
+        if (!res.ok) {
+            throw data
+        }
+        return data
     }
 
 
@@ -261,45 +232,33 @@ class Mpesa {
     // You can use the sandbox provided test credentials down below to simulates a payment made from the client phone's STK/SIM Toolkit menu, and enables you to receive the payment requests in real time.
 
 
-    c2bTransact(ShortCode: string, CommandID: string, Amount: string, Msisdn: string, BillRefNumber: string) {
+    async c2bTransact(ShortCode: string, CommandID: string, Amount: string, Msisdn: string, BillRefNumber: string) {
+        if (!ShortCode) throw new Error("Must provide a ShortCode")
+        if (!CommandID) throw new Error("Must provide a CommandID")
+        if (!Amount) throw new Error("Must provide an Amount")
+        if (!Msisdn) throw new Error("Must provide a Msisdn")
+        if (!BillRefNumber) throw new Error("Must provide a BillRefNumber")
 
+        let headers = await this._getHeaders()
 
-        return new Promise(async (resolve, reject) => {
+        let requestBody = {
+            ShortCode,
+            CommandID,
+            Amount,
+            Msisdn,
+            BillRefNumber
+        }
 
-            if (!ShortCode) reject(new Error("Must provide a ShortCode"))
-            if (!CommandID) reject(new Error("Must provide a CommandID"))
-            if (!Amount) reject(new Error("Must provide an Amount"))
-            if (!Msisdn) reject(new Error("Must provide a Msisdn"))
-            if (!BillRefNumber) reject(new Error("Must provide a BillRefNumber"))
-
-
-            let headers = await this._setHeaders()
-
-            let requestBody = {
-                ShortCode,
-                CommandID,
-                Amount,
-                Msisdn,
-                BillRefNumber
-            }
-            let data = JSON.stringify(requestBody)
-
-            try {
-                axios({
-                    method: "POST",
-                    url: this._c2bSimulateURL,
-                    data
-                }).then((res: any) => resolve(res.data))
-                    .catch((error: any) => { reject(error.response.data) })
-
-            } catch (error) {
-                reject(error)
-            }
-
-
+        let res = await fetch(this._c2bSimulateURL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(requestBody)
         })
-
-
+        let data = await res.json()
+        if (!res.ok) {
+            throw data
+        }
+        return data
     }
 
 
@@ -309,45 +268,34 @@ class Mpesa {
     // Use this API to enquire the balance on an M-Pesa BuyGoods (Till Number).
 
 
-    checkAccountBalance(CommandID: string, IdentifierType: string, Remarks: string) {
+    async checkAccountBalance(CommandID: string, IdentifierType: string, Remarks: string) {
+        if (!CommandID) throw new Error("Must provide a CommandID")
+        if (!IdentifierType) throw new Error("Must provide an IdentifierType")
+        if (!Remarks) throw new Error("Must provide a Remarks")
 
+        let headers = await this._getHeaders()
 
+        let requestBody = {
+            Initiator: this.Initiator,
+            SecurityCredential: this.SecurityCredential,
+            CommandID,
+            PartyA: this.ShortCode,
+            IdentifierType,
+            Remarks,
+            QueueTimeOutURL: this.QueueTimeOutURL,
+            ResultURL: this.ResultURL
+        }
 
-        return new Promise(async (resolve, reject) => {
-
-            if (!CommandID) reject(new Error("Must provide a CommandID"))
-            if (!IdentifierType) reject(new Error("Must provide an IdentifierType"))
-            if (!Remarks) reject(new Error("Must provide a Remarks"))
-
-            let headers = await this._setHeaders()
-
-            let requestBody = {
-                Initiator: this.Initiator,
-                SecurityCredential: this.SecurityCredential,
-                CommandID,
-                PartyA: this.ShortCode,
-                IdentifierType,
-                Remarks,
-                QueueTimeOutURL: this.QueueTimeOutURL,
-                ResultURL: this.ResultURL
-            }
-
-            let data = JSON.stringify(requestBody)
-
-            try {
-                axios({
-                    method: "POST",
-                    url: this._accountBalanceURL,
-                    data
-                })
-                    .then((res: any) => resolve(res.data))
-                    .catch((error: any) => { reject(error.response.data) })
-            } catch (error) {
-                reject(error)
-            }
+        let res = await fetch(this._accountBalanceURL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(requestBody)
         })
-
-
+        let data = await res.json()
+        if (!res.ok) {
+            throw data
+        }
+        return data
     }
 
 
@@ -356,49 +304,40 @@ class Mpesa {
     //  Use this API to transact between an M-Pesa short code to a phone number registered on M-Pesa.
 
 
-    b2c(Amount: string, PartyA: string, PartyB: string, Remarks: string, CommandID: string, Occassion: string, SecurityCredential: string) {
+    async b2c(Amount: string, PartyA: string, PartyB: string, Remarks: string, CommandID: string, Occassion: string, SecurityCredential: string) {
+        if (!Amount) throw new Error("Must provide a Amount")
+        if (!PartyA) throw new Error("Must provide a PartyA")
+        if (!PartyB) throw new Error("Must provide a PartyB")
+        if (!CommandID) throw new Error("Must provide a CommandID")
+        if (!Occassion) throw new Error("Must provide a Occassion")
+        if (!Remarks) throw new Error("Must provide a Remarks")
+        if (!SecurityCredential) throw new Error("Must provide a SecurityCredential")
 
-        return new Promise(async (resolve, reject) => {
+        let headers = await this._getHeaders()
 
-            if (!Amount) reject(new Error("Must provide a Amount"))
-            if (!PartyA) reject(new Error("Must provide a PartyA"))
-            if (!PartyB) reject(new Error("Must provide a PartyB"))
-            if (!CommandID) reject(new Error("Must provide a CommandID"))
-            if (!Occassion) reject(new Error("Must provide a Occassion"))
-            if (!Remarks) reject(new Error("Must provide a Remarks"))
-            if (!SecurityCredential) reject(new Error("Must provide a SecurityCredential"))
+        let requestBody = {
+            InitiatorName: this.Initiator,
+            SecurityCredential,
+            CommandID,
+            Amount,
+            PartyA,
+            PartyB,
+            Remarks,
+            QueueTimeOutURL: this.QueueTimeOutURL,
+            ResultURL: this.ResultURL,
+            Occassion
+        }
 
-
-
-            let headers = await this._setHeaders()
-
-            let requestBody = {
-                InitiatorName: this.Initiator,
-                SecurityCredential,
-                CommandID,
-                Amount,
-                PartyA,
-                PartyB,
-                Remarks,
-                QueueTimeOutURL: this.QueueTimeOutURL,
-                ResultURL: this.ResultURL,
-                Occassion
-            }
-
-            let data = JSON.stringify(requestBody)
-            try {
-                axios({
-                    method: "POST",
-                    url: this._b2cURL,
-                    data
-                })
-                    .then((res: any) => resolve(res.data))
-                    .catch((error: any) => { reject(error.response.data) })
-            } catch (error) {
-                reject(error)
-            }
+        let res = await fetch(this._b2cURL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(requestBody)
         })
-
+        let data = await res.json()
+        if (!res.ok) {
+            throw data
+        }
+        return data
     }
 
 }
